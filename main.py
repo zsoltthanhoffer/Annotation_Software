@@ -19,10 +19,13 @@ class App:
         App.root.rowconfigure(0,weight=60)
         App.root.rowconfigure(1,weight=1)
         App.root.rowconfigure(2,weight=15)
-        App.root.rowconfigure(3,weight=30)
+        App.root.rowconfigure(3,weight=10)
+        App.root.rowconfigure(4,weight=10)
         App.root.columnconfigure(0,weight=50)
-        App.root.columnconfigure(1,weight=25)
-        App.root.columnconfigure(4,weight=25)
+        App.root.columnconfigure(1,weight=10)
+        App.root.columnconfigure(2,weight=5)
+        App.root.columnconfigure(3,weight=5)
+        App.root.columnconfigure(4,weight=10)
 
     left_space = tk.Label(root)
     left_space.configure(bg="black")
@@ -93,13 +96,13 @@ class App:
     # currentimage = tk.Label(image=video_frame.current_img())
     # currentimage.grid(row=2,column=0)
 
-    browse_btn = tk.Button(root,text="Browse",command=lambda:App.openFile())
+    browse_btn = tk.Button(root,text="Browse",command=lambda:App.openFile(),width=10)
     browse_btn.grid(row=1,column=1,sticky=E)
-    play_btn = tk.Button(root,text="Play",command=lambda:App.playFile())
-    play_btn.grid(row=1,column=2)
-    stop_btn = tk.Button(root,text="Stop",command=lambda:App.stopFile())
-    stop_btn.grid(row=1,column=3)
-    pause_btn = tk.Button(root,text="Pause",command=lambda:App.pauseFile())
+    play_btn = tk.Button(root,text="Play",command=lambda:App.playFile(),width=10)
+    play_btn.grid(row=1,column=2,sticky=EW)
+    stop_btn = tk.Button(root,text="Stop",command=lambda:App.stopFile(),width=10)
+    stop_btn.grid(row=1,column=3,sticky=EW)
+    pause_btn = tk.Button(root,text="Pause",command=lambda:App.pauseFile(),width=10)
     pause_btn.grid(row=1,column=4,sticky=W)
 
     progress_value = tk.IntVar(root)
@@ -113,6 +116,15 @@ class App:
     video_frame.bind("<<Duration>>",update_duration)
     video_frame.bind("<<SecondChanged>>",update_scale)
     video_frame.bind("<<Ended>>",video_ended)
+
+    starthere_btn = tk.Button(root,text="Start here",width=10)
+    starthere_btn.grid(row=3,column=1,sticky=[E,S])
+    endhere_btn = tk.Button(root,text="End here",width=10)
+    endhere_btn.grid(row=3,column=2,sticky=[W,S])
+    label1 = tk.Label(root,text="Label:",width=10)
+    label1.grid(row=4,column=1,sticky=[N,E])
+    entry = tk.Entry(root,width=10,bg="white")
+    entry.grid(row=4,column=2,sticky=[W,N])
 
 
 
