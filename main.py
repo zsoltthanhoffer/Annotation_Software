@@ -98,9 +98,7 @@ class App:
         vs.set(cv2.CAP_PROP_POS_FRAMES,App.start_frame_number)
         frame_width = int(vs.get(3))
         frame_height = int(vs.get(4))
-
         
-
         size = (frame_width,frame_height)
         k =0
         l = []
@@ -140,15 +138,6 @@ class App:
             App.file_real_name = os.path.basename(filename).split('/')[-1]
             os.mkdir('./' + App.file_real_name)
             
-            # cap = cv2.VideoCapture(App.videourl)
-            # i = 0
-            # while(cap.isOpened()):
-            #     ret, frame = cap.read()
-            #     if ret == False:
-            #         break
-            #     else:
-            #         App.framelist.append(frame)
-            #         print(frame)
 
     def playFile():
         App.video_frame.play()
