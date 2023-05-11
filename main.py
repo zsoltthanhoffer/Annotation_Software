@@ -8,25 +8,45 @@ from PIL import Image,ImageTk
 import datetime
 import imageio
 import pandas as pd
+import numpy as np
+import os
+import threading
+import time
+import queue
 
 
 class App:
     root = Tk()
     def __init__(self):
-        App.root.geometry("1080x720")
-        App.root.configure(bg="white")
-        App.root.rowconfigure(0,weight=60)
-        App.root.rowconfigure(1,weight=1)
-        App.root.rowconfigure(2,weight=15)
-        App.root.rowconfigure(3,weight=10)
-        App.root.rowconfigure(4,weight=0)
-        App.root.rowconfigure(5,weight=10)
-        App.root.columnconfigure(0,weight=25)
-        App.root.columnconfigure(1,weight=20)
-        App.root.columnconfigure(2,weight=0)
-        App.root.columnconfigure(3,weight=0)
-        App.root.columnconfigure(4,weight=20)
+        self.root.geometry("1080x720")
+        self.root.configure(bg="white")
+        self.root.rowconfigure(0,weight=60)
+        self.root.rowconfigure(1,weight=1)
+        self.root.rowconfigure(2,weight=15)
+        self.root.rowconfigure(3,weight=10)
+        self.root.rowconfigure(4,weight=0)
+        self.root.rowconfigure(5,weight=10)
+        self.root.columnconfigure(0,weight=25)
+        self.root.columnconfigure(1,weight=20)
+        self.root.columnconfigure(2,weight=0)
+        self.root.columnconfigure(3,weight=0)
+        self.root.columnconfigure(4,weight=20)
 
+
+    savinglist = []
+    listoflabels = []
+
+    def saveclick():
+        k=0
+        for item in App.savinglist:
+            np.save(App.file_real_name + '/' + App.listoflabels[k],item)
+            k+=1
+        print('saving to folder is done')
+
+
+    canv = tk.Canvas(root)
+    canv.grid(row=0,column=0,columnspan=5,rowspan=4)
+    canv.create_line(300,35,300,200,dash=(4,2))
 
     bottom_space = tk.Label(root)
     bottom_space.grid(row=2,column=0,columnspan=5,sticky=[EW,NS])
@@ -65,9 +85,49 @@ class App:
     treescrolly.grid(row=0,column=0,sticky=[E,NS])
     treescrollx.grid(row=0,column=0,sticky=[S,EW])
     
-
+    file_real_name = ""
     videourl = ""
-    
+    start_frame_number = 0
+    end_frame_number = 0
+
+    framelist = []
+
+
+    def saving_frames():
+        vs = cv2.VideoCapture(App.videourl)
+        vs.set(cv2.CAP_PROP_POS_FRAMES,App.start_frame_number)
+        frame_width = int(vs.get(3))
+        frame_height = int(vs.get(4))
+
+        
+
+        size = (frame_width,frame_height)
+        k =0
+        l = []
+        
+        # result = cv2.VideoWriter(App.file_real_name + '/' + App.labels + '.avi',cv2.VideoWriter_fourcc(*'XVID'),5,size,True)
+        while True:
+            grabbed, frame = vs.read()
+            l.append(frame)
+            # print('frame running')
+            k+=1
+            # frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+            #frame = cv2.resize(frame,(1080,720),interpolation=cv2.INTER_AREA)
+            # result.write(frame)
+
+            if not grabbed:
+                break
+            if k == App.end_frame_number:
+                break
+            
+            # App.frames.append(frame)
+        # np.save(App.file_real_name + '/' + App.labels,l)
+        # result.release()
+        
+        App.savinglist.append(l)
+        vs.release()
+        cv2.destroyAllWindows()
+        print('saving ended')
 
 
     def openFile():
@@ -77,8 +137,22 @@ class App:
             filename = file.name
             App.video_frame.load(r"{}".format(filename))
             App.videourl = file.name
+            App.file_real_name = os.path.basename(filename).split('/')[-1]
+            os.mkdir('./' + App.file_real_name)
+            
+            # cap = cv2.VideoCapture(App.videourl)
+            # i = 0
+            # while(cap.isOpened()):
+            #     ret, frame = cap.read()
+            #     if ret == False:
+            #         break
+            #     else:
+            #         App.framelist.append(frame)
+            #         print(frame)
+
     def playFile():
         App.video_frame.play()
+        print(App.video_frame)
     
     def stopFile():
         App.video_frame.stop()
@@ -109,16 +183,18 @@ class App:
     def starthere():
         startheretime = App.start_time["text"]
         App.starttimes = startheretime
-        print(App.starttimes)
+        App.start_frame_number = App.video_frame.current_frame_number()
     def endhere():
         endheretime = App.start_time["text"]
         App.endtimes = endheretime
-        print(App.endtimes)
+        App.end_frame_number = App.video_frame.current_frame_number()
     def submit():
+        thread = threading.Thread(target=App.saving_frames)
+        thread.start()
         annot = App.entry.get()
         App.labels = annot
+        App.listoflabels.append(annot)
         App.data.loc[len(App.data.index)] = [App.starttimes,App.endtimes,App.labels]
-        print(App.data.index)
 
         App.data.reset_index(inplace=True,drop=True)
         App.clear_data()
@@ -127,17 +203,16 @@ class App:
         for row in df_rows:
             App.tv.insert("","end",iid=i,values=row)
             i+=1
-        print(App.tv.get_children())
-        print(App.data)
-
-    
-
+        
 
     def clear_data():
         App.tv.delete(*App.tv.get_children())
     
     def delete_item():
         for selecteditem in App.tv.selection():
+            print(len(App.savinglist))
+            del App.savinglist[int(selecteditem)]
+            del App.listoflabels[int(selecteditem)]
             App.tv.delete(selecteditem)
             App.data.drop(int(selecteditem),inplace=True)
         App.data.reset_index(inplace=True,drop=True)
@@ -148,6 +223,15 @@ class App:
             App.tv.insert("","end",iid=i,values=row)
             i+=1
 
+        print(len(App.savinglist))
+        print(App.listoflabels)
+
+    def clear_all():
+        App.clear_data()
+        App.data = App.data[0:0]
+        del App.savinglist[:]
+        del App.listoflabels[:]
+        print(App.listoflabels)
 
     def seek(value):
         App.video_frame.seek(int(value))
@@ -194,6 +278,14 @@ class App:
     submit_btn.grid(row=5,column=2,columnspan=2,sticky=[N,W])
     delete_btn = tk.Button(root,text="Delete",command=lambda:App.delete_item())
     delete_btn.grid(row=1,column=0)
+    frame_btn = tk.Button(root,text="saveframe",width=10,command=lambda:App.saveclick())
+    frame_btn.grid(row=1,column=0,sticky=W)
+    clear_all_btn = tk.Button(root,text="Clear All",width=10,command=lambda:App.clear_all())
+    clear_all_btn.grid(row=1,column=0,sticky=E)
+
+
+
+
 
 
 
@@ -201,5 +293,6 @@ class App:
 def main():
     app = App()
     app.root.mainloop()
+
 
 if __name__ == "__main__": main()
