@@ -17,6 +17,8 @@ import queue
 
 class App:
     root = Tk()
+    s = ttk.Style()
+    s.theme_use('xpnative')
     def __init__(self):
         self.root.geometry("1080x720")
         self.root.configure(bg="white")
@@ -48,19 +50,19 @@ class App:
     canv.grid(row=0,column=0,columnspan=5,rowspan=4)
     canv.create_line(300,35,300,200,dash=(4,2))
 
-    bottom_space = tk.Label(root)
+    bottom_space = ttk.Label(root)
     bottom_space.grid(row=2,column=0,columnspan=5,sticky=[EW,NS])
 
     video_frame = TkinterVideo(root,keep_aspect=True,scaled=True)
     video_frame.grid(row=0,column=1,columnspan=5,sticky=[EW,NS])
 
-    start_time = tk.Label(root, text = str(datetime.timedelta(seconds=0)))
+    start_time = ttk.Label(root, text = str(datetime.timedelta(seconds=0)))
     start_time.grid(row=3,column=0,sticky=[W,N])
 
-    end_time = tk.Label(root,text= str(datetime.timedelta(seconds=0)))
+    end_time = ttk.Label(root,text= str(datetime.timedelta(seconds=0)))
     end_time.grid(row=3,column=4,sticky=[E,N])
 
-    picfromvid = tk.Label(root,image=None,anchor=CENTER)
+    picfromvid = ttk.Label(root,image=None,anchor=CENTER)
 
 
     labellist = tk.Listbox(root)
@@ -79,8 +81,8 @@ class App:
 
 
 
-    treescrolly = tk.Scrollbar(root,orient="vertical",command=tv.yview)
-    treescrollx = tk.Scrollbar(root,orient="horizontal",command=tv.xview)
+    treescrolly = ttk.Scrollbar(root,orient="vertical",command=tv.yview)
+    treescrollx = ttk.Scrollbar(root,orient="horizontal",command=tv.xview)
     tv.configure(xscrollcommand=treescrollx.set,yscrollcommand=treescrolly.set)
     treescrolly.grid(row=0,column=0,sticky=[E,NS])
     treescrollx.grid(row=0,column=0,sticky=[S,EW])
@@ -234,17 +236,17 @@ class App:
         App.progress_slider.set(0)
 
 
-    browse_btn = tk.Button(root,text="Browse",command=lambda:App.openFile(),width=10)
+    browse_btn = ttk.Button(root,text="Browse",command=lambda:App.openFile(),width=10)
     browse_btn.grid(row=1,column=1,sticky=E)
-    play_btn = tk.Button(root,text="Play",command=lambda:App.playFile(),width=10)
+    play_btn = ttk.Button(root,text="Play",command=lambda:App.playFile(),width=10)
     play_btn.grid(row=1,column=2)
-    stop_btn = tk.Button(root,text="Stop",command=lambda:App.stopFile(),width=10)
+    stop_btn = ttk.Button(root,text="Stop",command=lambda:App.stopFile(),width=10)
     stop_btn.grid(row=1,column=3)
-    pause_btn = tk.Button(root,text="Pause",command=lambda:App.pauseFile(),width=10)
+    pause_btn = ttk.Button(root,text="Pause",command=lambda:App.pauseFile(),width=10)
     pause_btn.grid(row=1,column=4,sticky=W)
 
     progress_value = tk.IntVar(root)
-    progress_slider = tk.Scale(root, variable = progress_value, from_=0, to=0,orient="horizontal",command=lambda val:App.slide(),showvalue=0)
+    progress_slider = ttk.Scale(root, variable = progress_value, from_=0, to=0,orient="horizontal",command=lambda val:App.slide())
     progress_slider.grid(row=2,column=0,columnspan=5,sticky=[EW,S])
 
     def slide():
@@ -255,21 +257,21 @@ class App:
     video_frame.bind("<<SecondChanged>>",update_scale)
     video_frame.bind("<<Ended>>",video_ended)
 
-    starthere_btn = tk.Button(root,text="Start here",width=10,command=lambda:App.starthere())
+    starthere_btn = ttk.Button(root,text="Start here",width=10,command=lambda:App.starthere())
     starthere_btn.grid(row=3,column=1,sticky=[E,S])
-    endhere_btn = tk.Button(root,text="End here",width=10,command=lambda:App.endhere())
+    endhere_btn = ttk.Button(root,text="End here",width=10,command=lambda:App.endhere())
     endhere_btn.grid(row=3,column=2,sticky=[W,S])
-    label1 = tk.Label(root,text="Label:",width=10)
+    label1 = ttk.Label(root,text="Label:",width=10)
     label1.grid(row=4,column=1,sticky=[E])
-    entry = tk.Entry(root,bg="white",width=10)
+    entry = ttk.Entry(root,background="white",width=10)
     entry.grid(row=4,column=2,sticky=EW)
-    submit_btn = tk.Button(root,text="Submit",width=10,command=lambda:App.submit())
+    submit_btn = ttk.Button(root,text="Submit",width=10,command=lambda:App.submit())
     submit_btn.grid(row=5,column=2,columnspan=2,sticky=[N,W])
-    delete_btn = tk.Button(root,text="Delete",command=lambda:App.delete_item())
+    delete_btn = ttk.Button(root,text="Delete",command=lambda:App.delete_item())
     delete_btn.grid(row=1,column=0)
-    frame_btn = tk.Button(root,text="saveframe",width=10,command=lambda:App.saveclick())
+    frame_btn = ttk.Button(root,text="saveframe",width=10,command=lambda:App.saveclick())
     frame_btn.grid(row=1,column=0,sticky=W)
-    clear_all_btn = tk.Button(root,text="Clear All",width=10,command=lambda:App.clear_all())
+    clear_all_btn = ttk.Button(root,text="Clear All",width=10,command=lambda:App.clear_all())
     clear_all_btn.grid(row=1,column=0,sticky=E)
 
 
